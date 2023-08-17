@@ -10,23 +10,7 @@ const productRouter = Router()
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-// Obtener todos los productos
-productRouter.get('/', async (req, res) => {
-    try {
-      const limit = req.query.limit; // Obtener el límite de resultados del query param
-  
-      // const products = productManager.getProducts(); //Esto es lo que se hace en FS
-      const products = await ProductModel.find({}); // Usar el método find() de Mongoose para obtener todos los productos
-      req.io.emit('mostrarProductos', products);
-      console.log('mostrarProductos - PC1')
-      // Aplicar el límite si se especificó en el query param
-      const limitedProducts = limit ? products.slice(0, limit) : products;
-      
-      res.json(limitedProducts);
-    } catch (error) {
-      res.status(500).json({ error: 'Error al obtener los productos' });
-    }
-  });
+
   
   // Endpoint dinamico para obtener un producto por su ID 
   productRouter.get('/:pid', async (req, res) => {
@@ -35,12 +19,19 @@ productRouter.get('/', async (req, res) => {
     try {
       const product = await ProductModel.findById(productId); // Usar el método findById() de Mongoose para buscar el producto por su ID
       console.log('paso 2')
+      
+
       if (!product) {
         res.status(404).json({ error: 'Producto no encontrado' });
         console.log('paso 3-1')
       } else {
-        res.json(product);
-        console.log('paso 3-2')
+
+        const formattedProduct = 
+       { ...product.toObject(), // Convert Mongoose object to plain object
+       _id: product._id.toString()};
+      
+        return res.render('product', formattedProduct)
+        
       }
     } catch (error) {
       res.status(500).json({ error: 'Error al obtener el producto' });
@@ -48,7 +39,61 @@ productRouter.get('/', async (req, res) => {
     }
   });
 
+// Ruta para mostrar todos los productos con paginación y filtros
+productRouter.get('/', async (req, res) => {
+  try {
+      const { limit, page, sort, query } = req.query;
 
+      let products = await ProductModel.find({});
+      let formattedProducts = products.map(product => ({
+        ...product.toObject(), // Convert Mongoose object to plain object
+         _id: product._id.toString()
+      }));
+
+      // Aplicar filtros según el query param "query"
+      // if (query) {
+      //   formattedProducts = formattedProducts.filter(product => product.category === query);
+      // } 
+      try {
+        if (query) {
+          formattedProducts = formattedProducts.filter(product => product.category === query);
+        }
+      } catch (error) {
+        console.error('Error al filtrar productos por categoría:', error);
+      }
+
+      // Ordenar según el query param "sort"
+      if (sort === 'desc') {
+        formattedProducts.sort((a, b) => b.price - a.price);
+      } else if (sort === 'asc') {
+        formattedProducts.sort((a, b) => a.price - b.price);
+      }
+
+      // Calcular paginación
+      const perPage = limit ? parseInt(limit) : 10;
+      const currentPage = page ? parseInt(page) : 1;
+      const startIndex = (currentPage - 1) * perPage;
+      const endIndex = startIndex + perPage;
+
+      // Aplicar paginación
+      const paginatedProducts = formattedProducts.slice(startIndex, endIndex);
+      
+
+      const params = {
+          title: 'Prueba',
+          products: paginatedProducts,
+          totalPages: Math.ceil(formattedProducts.length / perPage),
+          prevPage: currentPage > 1 ? currentPage - 1 : null,
+          nextPage: currentPage < Math.ceil(formattedProducts.length / perPage) ? currentPage + 1 : null,
+          currentPage: currentPage
+      };
+
+
+      res.render('products', params);
+  } catch (error) {
+      res.status(500).json({ error: 'Error al obtener los productos' });
+  }
+});
 
 // Agregar un nuevo producto
 productRouter.post('/', async (req, res) => {
@@ -131,3 +176,15 @@ productRouter.delete('/:pid', async (req, res) => {
 
 
   module.exports=productRouter
+
+
+
+  /// Para probar filtros y paginado
+
+//  http://localhost:8080/api/products?query=Comestibles&sort=desc
+
+// http://localhost:8080/api/products?query=Electronicos
+
+// http://localhost:8080/api/products?sort=asc
+
+// http://localhost:8080/api/products?limit=5&page=2
