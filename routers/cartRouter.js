@@ -77,8 +77,9 @@ cartRouter.post('/', async (req, res) => {
       console.log('paso 4');
   
       if (!cart) {
-        res.status(404).json({ error: 'Carrito no encontrado' });
-        console.log('paso 5');
+        // res.status(404).json({ error: 'Carrito no encontrado' });
+        // console.log('paso 5');
+        
       } else {
         if (!cart.products) {
           cart.products = []; // Initialize the products array if it doesn't exist

@@ -16,6 +16,7 @@ const handlebars = require ('express-handlebars')
 const {Server} = require('socket.io')
 
 const ProductModel = require('./Dao/Models/products.model')
+const CartModel = require('./Dao/Models/cart.model');
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -54,9 +55,52 @@ io.on ('connection', (socket) =>{
   
   console.log('Nuevo cliente conectado', socket.id)
 
-  socket.on('mi_mensaje', (data) =>{  //para recibir mensajes del lado del servidor
-    console.log(data)
-  })
+   // Crear un nuevo carrito asociado al socketId
+   const newCart = new CartModel({
+    socketID: socketId,
+    products: []
+  });
+
+  newCart.save()
+    .then((savedCart) => {
+      const cartId = savedCart._id; // Obtener el _id del carrito
+      console.log('Carrito nuevo creado:', savedCart);
+      console.log('ID del carrito:', cartId);
+
+      // Emitir el evento 'createCart' con el socketId y cartId
+      socket.emit('createCart', { socketId, cartId });
+    })
+    .catch((error) => {
+      console.error('Error al crear carrito:', error);
+    });
+
+    socket.on('addToCart', async ({ socketId, productId }) => {
+      try {
+        const cart = await CartModel.findOne({ socketID: socketId });
+  
+        if (!cart) {
+          console.error('Carrito no encontrado');
+          return;
+        }
+  
+        // Buscar si el producto ya existe en el carrito
+        const existingProductIndex = cart.products.findIndex((product) => product.productID === productId);
+  
+        if (existingProductIndex !== -1) {
+          // Si el producto existe, incrementar la cantidad en 1
+          cart.products[existingProductIndex].quantity += 1;
+        } else {
+          // Si el producto no existe, agregarlo al carrito con cantidad 1
+          cart.products.push({ productID: productId, quantity: 1 });
+        }
+  
+        await cart.save();
+  
+        console.log(`Producto ${productId} agregado al carrito ${cart._id}`);
+      } catch (error) {
+        console.error('Error al agregar producto al carrito:', error);
+      }
+    });
 
   socket.on('joinChat', async (username) =>{  
 

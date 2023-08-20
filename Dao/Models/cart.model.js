@@ -7,6 +7,7 @@ const productSchema = mongoose.Schema({
 });
 
 const cartSchema = mongoose.Schema({
+  socketID: String,
   products: [productSchema]
 });
 const CartModel = mongoose.model('carts', cartSchema);
