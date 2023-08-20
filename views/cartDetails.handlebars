@@ -1,0 +1,12 @@
+<!-- cartDetails.handlebars -->
+
+<h1>Detalles del Carrito</h1>
+
+<h2>Carrito ID: {{cart._id}}</h2>
+
+<h3>Productos en el Carrito:</h3>
+<ul>
+  {{#each cart.products}}
+    <li>{{this.productID}} (Cantidad: {{this.quantity}})</li>
+  {{/each}}
+</ul>
