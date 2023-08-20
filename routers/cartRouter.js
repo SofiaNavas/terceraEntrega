@@ -248,11 +248,6 @@ cartRouter.delete('/:cid/products', async (req, res) => {
 });
 
 
-
-
-
-
-
 module.exports=cartRouter
 
 
