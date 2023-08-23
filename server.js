@@ -31,6 +31,8 @@ const productRouter = require('./routers/productRouter')
 const cartRouter = require('./routers/cartRouter')
 
 const ChatModel = require('./Dao/Models/chat.model');
+const productRouterViews = require('./routers/productRouterViews');
+const cartRouterViews = require('./routers/cartRouterViews');
 
 
 
@@ -41,11 +43,17 @@ const io = new Server(httpServer);
 
 
 app.use('/api/carts', cartRouter)
+app.use('/carts', cartRouterViews)
 
 app.use('/api/products', (req, res, next) => {
     req.io = io; // Pass the io instance to the request object
     next();
   }, productRouter);
+
+  app.use('/products', (req, res, next) => {
+    req.io = io; // Pass the io instance to the request object
+    next();
+  }, productRouterViews);
 
   
 io.on ('connection', (socket) =>{

@@ -5,7 +5,7 @@ const CartManager = require('../Dao/CartManager');
 const Router = express.Router;
 
 const app = express();
-const cartRouter = Router()
+const cartRouterViews = Router()
 const cartManager = new CartManager('./cart.json');
 
 app.use(express.json())
@@ -14,7 +14,7 @@ app.use(express.urlencoded({extended: true}))
 
 
 // Obtener todos los carritos
-cartRouter.get('/', async (req, res) => {
+cartRouterViews.get('/', async (req, res) => {
   try {
     const limit = req.query.limit; // Obtener el límite de resultados del query param
 
@@ -49,7 +49,7 @@ cartRouter.get('/', async (req, res) => {
   //   }
   // });
 
-  cartRouter.get('/:cid', async (req, res) => {
+  cartRouterViews.get('/:cid', async (req, res) => {
     const cartId = req.params.cid;
   
     try {
@@ -64,7 +64,7 @@ cartRouter.get('/', async (req, res) => {
         cart: cart.toObject(), // Convertir el carrito a un objeto plano
       };
   
-      return res.json(cart)
+      return res.render('cartDetails', params);
     } catch (error) {
       return res.status(500).json({ error: 'Error al obtener los detalles del carrito' });
     }
@@ -72,7 +72,7 @@ cartRouter.get('/', async (req, res) => {
 
 
 // Crear un nuevo carrito
-cartRouter.post('/', async (req, res) => {
+cartRouterViews.post('/', async (req, res) => {
   try {
     const cartData = req.body;
     const newCart = await CartModel.create(cartData); // Usar el método create() de Mongoose para crear un nuevo carrito
@@ -85,7 +85,7 @@ cartRouter.post('/', async (req, res) => {
 
 
   // Actualizar un carrito
-  cartRouter.post('/:cid/product/:pid', async (req, res) => {
+  cartRouterViews.post('/:cid/product/:pid', async (req, res) => {
     const cartId = req.params.cid;
     console.log('paso 1');
     const productId = req.params.pid;
@@ -136,7 +136,7 @@ cartRouter.post('/', async (req, res) => {
 
 
   // Eliminar un carrito
-  cartRouter.delete('/:cid', async (req, res) => {
+  cartRouterViews.delete('/:cid', async (req, res) => {
   const cartId = req.params.cid;
   try {
     const deletedCart = await CartModel.findByIdAndDelete(cartId);
@@ -153,7 +153,7 @@ cartRouter.post('/', async (req, res) => {
 
 
 // Eliminar un producto del carrito
-cartRouter.delete('/:cid/products/:pid', async (req, res) => {
+cartRouterViews.delete('/:cid/products/:pid', async (req, res) => {
   const cartId = req.params.cid;
   const productId = req.params.pid;
 
@@ -176,7 +176,7 @@ cartRouter.delete('/:cid/products/:pid', async (req, res) => {
 
 
 // Actualizar un carrito con un arreglo de productos
-cartRouter.put('/:cid', async (req, res) => {
+cartRouterViews.put('/:cid', async (req, res) => {
   const cartId = req.params.cid;
   const newProducts = req.body.products;
 
@@ -198,7 +198,7 @@ cartRouter.put('/:cid', async (req, res) => {
 });
 
 // Actualizar la cantidad de un producto en el carrito
-cartRouter.put('/:cid/products/:pid', async (req, res) => {
+cartRouterViews.put('/:cid/products/:pid', async (req, res) => {
   const cartId = req.params.cid;
   const productId = req.params.pid;
   const newQuantity = req.body.quantity;
@@ -227,7 +227,7 @@ cartRouter.put('/:cid/products/:pid', async (req, res) => {
 });
 
 // Eliminar todos los productos del carrito
-cartRouter.delete('/:cid/products', async (req, res) => {
+cartRouterViews.delete('/:cid/products', async (req, res) => {
   const cartId = req.params.cid;
 
   try {
@@ -248,7 +248,7 @@ cartRouter.delete('/:cid/products', async (req, res) => {
 });
 
 
-module.exports=cartRouter
+module.exports=cartRouterViews
 
 
 /// para testear los endpoints nuevos
