@@ -10,7 +10,7 @@ class CartManager {
   checkPath() {
     try {
       const fileContent = fs.readFileSync(this.path, 'utf-8');
-      console.log("The file exists. The path is " + this.path);
+      // console.log("The file exists. The path is " + this.path);
       this.products = JSON.parse(fileContent) || [];
     } catch (error) {
       if (error.code === 'ENOENT') {
