@@ -3,8 +3,27 @@
 
 <script src="/js/products.js"></script>
 
+<h2>Bienvenido a eccomerce! Estos son tus datos</h2>
+    <div class="profile-container">
+        <p class="profile-label">Nombre:</p>
+        <p class="profile-info">{{user.name}}</p>
+        <p class="profile-label">Apellido:</p>
+        <p class="profile-info">{{user.lastname}}</p>
+        <p class="profile-label">Email:</p>
+        <p class="profile-info">{{user.email}}</p>
+        <p class="profile-label">Edad:</p>
+        <p class="profile-info">{{user.age}}</p>
+    </div>
 
+    <div class="logout-form">
+        <form action="/logout" method="POST">
+            <input type="submit" class="logout-button" value="Cerrar sesión">
+        </form>
+    </div>
 
+    <br><br>
+<h2>Productos</h2>
+<br>
 
 <table id="productos" class="table">
     <tr>
@@ -60,4 +79,51 @@
     .table tr:nth-child(even) {
         background-color: #f2f2f2;
     }
+
+     
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+        .profile-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .profile-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .profile-info {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .logout-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .logout-button {
+            width: 25%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 3px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .logout-button:hover {
+            background-color: #0056b3;
+        }
+    
 </style>

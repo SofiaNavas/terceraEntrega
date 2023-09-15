@@ -30,6 +30,7 @@ app.use(express.static('public'))
 const productRouter = require('./routers/productRouter')
 const cartRouter = require('./routers/cartRouter')
 const sessionsRouter = require('./routers/sessionsRouter')
+const sessionsRouterViews = require('./routers/sessionsRouterViews')
 
 const ChatModel = require('./Dao/Models/chat.model');
 const productRouterViews = require('./routers/productRouterViews');
@@ -46,6 +47,7 @@ const io = new Server(httpServer);
 app.use('/api/carts', cartRouter)
 app.use('/carts', cartRouterViews)
 app.use('/api/sessions', sessionsRouter)
+app.use('/', sessionsRouterViews)
 
 app.use('/api/products', (req, res, next) => {
     req.io = io; // Pass the io instance to the request object
@@ -220,7 +222,7 @@ return res.render('realTimeProducts', params)
 
 app.get('/loginChat', (req,res) => {
 
-  return res.render('login')
+  return res.render('loginChat')
 })
 
 app.post('/login',  async (req,res) => {
