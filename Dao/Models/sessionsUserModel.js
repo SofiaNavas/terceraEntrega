@@ -11,6 +11,10 @@ const sessionsUserSchema = Schema({
 },
   age: Number,
   password: String,
+  admin: {
+    type: Boolean,
+    default: false 
+  },
   createdAt: Date
 });
 

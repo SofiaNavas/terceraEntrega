@@ -41,8 +41,14 @@ return next ()
 //  console.log('User data in sessionsRouterViews:', user);
 //  console.log('Session data in sessionsRouterViews:', req.session);
   
-   return res.render('profile', {user});
+//    return res.render('profile', {user});
+return res.redirect('/products')
+
+
 })
+
+
+
 
 
 

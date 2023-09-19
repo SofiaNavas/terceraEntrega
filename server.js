@@ -76,8 +76,8 @@ io.on ('connection', (socket) =>{
   newCart.save()
     .then((savedCart) => {
       const cartId = savedCart._id; // Obtener el _id del carrito
-      console.log('Carrito nuevo creado:', savedCart);
-      console.log('ID del carrito:', cartId);
+      // console.log('Carrito nuevo creado:', savedCart);
+      // console.log('ID del carrito:', cartId);
 
       // Emitir el evento 'createCart' con el socketId y cartId
       socket.emit('createCart', { socketId, cartId });

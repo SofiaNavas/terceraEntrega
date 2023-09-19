@@ -41,6 +41,9 @@ app.use(express.urlencoded({extended: true}))
 
 // Ruta para mostrar todos los productos con paginación y filtros
 productRouterViews.get('/', async (req, res) => {
+  // user = {name:"juan", lastname:"perez", email:"email", age:30}
+  user= req.session.user
+  console.log(user)
   try {
       const { limit, page, sort, query } = req.query;
 
@@ -85,10 +88,11 @@ productRouterViews.get('/', async (req, res) => {
           totalPages: Math.ceil(formattedProducts.length / perPage),
           prevPage: currentPage > 1 ? currentPage - 1 : null,
           nextPage: currentPage < Math.ceil(formattedProducts.length / perPage) ? currentPage + 1 : null,
-          currentPage: currentPage
+          currentPage: currentPage,
+          user:user
       };
 
-
+      
       res.render('products', params);
   } catch (error) {
       res.status(500).json({ error: 'Error al obtener los productos' });

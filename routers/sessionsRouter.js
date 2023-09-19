@@ -47,40 +47,55 @@ sessionsRouter.post('/register', async (req, res) => {
 
  sessionsRouter.post('/login', async (req, res) => {
 
-   let user = await sessionsUserModel.findOne({email: req.body.email})
+   let user = await sessionsUserModel.findOne({email: req.body.email}) 
 
-   if (!user){
-    return res.status(401).json({
-        error: 'El usuario no existe en el sistema'
-    })
-   }
+if (!user) {
+    // Verificar si las credenciales coinciden con las de administrador
+    if (req.body.email === 'adminCoder@coder.com' && req.body.password === 'adminCod3r123') {
+        // Establecer 'admin' en 'true' en lugar de crear un usuario en la base de datos
+        user = {
+            email: 'adminCoder@coder.com',
+            admin: true
+        };
 
-   if (user.password !== req.body.password) {
-    return res.status(401).json({
-        error: 'Password incorrecta'
-    })
+        req.session.user = user
 
-   }
-   user = user.toObject()
+        return res.redirect('/products')
+
+    } else {
+        return res.status(401).json({
+            error: 'El usuario no existe en el sistema'
+        });
+    }
+}
+
+if (user) {
+
+    if (user.password !== req.body.password) {
+        return res.status(401).json({
+            error: 'Password incorrecta'
+        })
+    
+       }
+
+    user = user.toObject()
    delete user.password
    req.session.user = user
-//    console.log('User data saved in sessionsRouter:', req.session.user);
 
+   req.session.save(err => {
+    if (err) {
+        console.error('Error saving session:', err);
+    } else {
+        console.log('Session data saved successfully');
+    }
+ 
     
-        req.session.save(err => {
-        if (err) {
-            console.error('Error saving session:', err);
-        } else {
-            console.log('Session data saved successfully');
-        }
+});  
 
-      
-        return res.redirect('/products');  
-        // return res.redirect('/profile');  
-    });
+ // return res.redirect('/products');  
+ return res.redirect('/profile'); 
 
-
- })
+}})
 
 
 
@@ -98,6 +113,6 @@ sessionsRouter.post('/logout', (req, res) => {
 module.exports=sessionsRouter
 
 
-// 1.30.05
+// 1.51.04
 
 
