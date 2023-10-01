@@ -2,9 +2,24 @@ const express = require('express');
 const mongoose = require('mongoose')
 const app = express();
 
+const passport = require('passport')
+const initializePassport = require('./config/passport.config')
 
-MONGODB_CONNECT= 'mongodb+srv://sofianavasg:Coder01!@cluster0.8ieczog.mongodb.net/ecommerce?retryWrites=true&w=majority'
+
+// MONGODB_CONNECT= 'mongodb+srv://sofianavasg:Coder01!@cluster0.8ieczog.mongodb.net/ecommerce?retryWrites=true&w=majority'
+// mongoose.connect(MONGODB_CONNECT)
+// .catch(err =>{
+//     if (err) {
+//         console.log('No se pudo conectar a la DB', err)
+//         process.exit()
+//     }
+// })
+
+const MONGODB_CONNECT= 'mongodb+srv://sofianavasg:Coder01!@cluster0.8ieczog.mongodb.net/ecommerce?retryWrites=true&w=majority'
 mongoose.connect(MONGODB_CONNECT)
+.then(async _ => {
+  console.log('conectado a la db (log desde server.js)')
+})
 .catch(err =>{
     if (err) {
         console.log('No se pudo conectar a la DB', err)
@@ -14,6 +29,8 @@ mongoose.connect(MONGODB_CONNECT)
 
 const handlebars = require ('express-handlebars')
 const {Server} = require('socket.io')
+
+
 
 const ProductModel = require('./Dao/Models/products.model')
 const CartModel = require('./Dao/Models/cart.model');
@@ -27,6 +44,18 @@ app.set('view engine', 'handlebars')
 
 app.use(express.static('public'))
 
+// app.use(cookieParser('secretkey'))
+
+// app.use(session({
+//   secret: 'secretkey', // Replace with your secret key
+//   resave: true,
+//   saveUninitialized: true
+// }))
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
 const productRouter = require('./routers/productRouter')
 const cartRouter = require('./routers/cartRouter')
 const sessionsRouter = require('./routers/sessionsRouter')
@@ -35,6 +64,7 @@ const sessionsRouterViews = require('./routers/sessionsRouterViews')
 const ChatModel = require('./Dao/Models/chat.model');
 const productRouterViews = require('./routers/productRouterViews');
 const cartRouterViews = require('./routers/cartRouterViews');
+const cookieParser = require('cookie-parser');
 
 
 
@@ -179,22 +209,9 @@ io.on ('connection', (socket) =>{
     });
   });
 
-
-
-  // socket.emit('recibiendomensajebackend', 'primer mensaje enviado desde el backend')
-
 })
 
   
-  app.get('/healthcheck', (req,res) => {
-      return res.json({
-          status: 'running',
-          date: new Date()
-      })
-  })
-
-
-
   app.get('/realtimeproducts', async (req,res) => {
 
 try{

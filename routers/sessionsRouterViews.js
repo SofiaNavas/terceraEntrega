@@ -21,7 +21,7 @@ return next ()
 
 sessionsRouterViews.get('/login', (req, res, next) => {
 
-    if(req.session.user) {
+    if(req.user) {
         return res.redirect('/profile')
     }
 return next ()
@@ -49,7 +49,15 @@ return res.redirect('/products')
 
 
 
+sessionsRouterViews.get('/recovery-password', (req, res, next) => {
 
+    if(req.session.user) {
+        return res.redirect('/profile')
+    }
+return next ()
+},(req, res) => {
+    return res.render('recovery-password')
+})
 
 
 

@@ -9,6 +9,10 @@ const sessionsUserSchema = Schema({
     type: String,
     unique: true
 },
+username: {
+  type: String,
+  unique: true
+},
   age: Number,
   password: String,
   admin: {

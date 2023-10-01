@@ -1,5 +1,9 @@
+
 const express = require('express');
+const passport = require('passport');
 const ProductModel = require('../Dao/Models/products.model');
+const initializePassport = require('../config/passport.config')
+
 
 const Router = express.Router;
 
@@ -10,40 +14,25 @@ const productRouterViews = Router()
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(initializePassport)
+// productRouterViews.use(sessionMiddleware);
 
-  
-  // Endpoint dinamico para obtener un producto por su ID 
-  productRouterViews.get('/:pid', async (req, res) => {
-    const productId = req.params.pid; // Obtener el ID del producto como entero
-   console.log('paso 1')
-    try {
-      const product = await ProductModel.findById(productId); // Usar el método findById() de Mongoose para buscar el producto por su ID
-      console.log('paso 2')
-      
 
-      if (!product) {
-        res.status(404).json({ error: 'Producto no encontrado' });
-        console.log('paso 3-1')
-      } else {
 
-        const formattedProduct = 
-       { ...product.toObject(), // Convert Mongoose object to plain object
-       _id: product._id.toString()};
-      
-        return res.render('product', formattedProduct)
-        
-      }
-    } catch (error) {
-      res.status(500).json({ error: 'Error al obtener el producto' });
-      console.log('paso 4')
-    }
-  });
+
+
 
 // Ruta para mostrar todos los productos con paginación y filtros
 productRouterViews.get('/', async (req, res) => {
   // user = {name:"juan", lastname:"perez", email:"email", age:30}
-  user= req.session.user
-  console.log(user)
+ 
+  const user= req.session.user
+  
+ 
+  console.log('user from productRouterview', user)
+
   try {
       const { limit, page, sort, query } = req.query;
 
@@ -53,10 +42,7 @@ productRouterViews.get('/', async (req, res) => {
          _id: product._id.toString()
       }));
 
-      // Aplicar filtros según el query param "query"
-      // if (query) {
-      //   formattedProducts = formattedProducts.filter(product => product.category === query);
-      // } 
+     
       try {
         if (query) {
           formattedProducts = formattedProducts.filter(product => product.category === query);
@@ -98,6 +84,35 @@ productRouterViews.get('/', async (req, res) => {
       res.status(500).json({ error: 'Error al obtener los productos' });
   }
 });
+  
+  // Endpoint dinamico para obtener un producto por su ID 
+  productRouterViews.get('/:pid', async (req, res) => {
+    const productId = req.params.pid; // Obtener el ID del producto como entero
+   console.log('paso 1')
+    try {
+      const product = await ProductModel.findById(productId); // Usar el método findById() de Mongoose para buscar el producto por su ID
+      console.log('paso 2')
+      
+
+      if (!product) {
+        res.status(404).json({ error: 'Producto no encontrado' });
+        console.log('paso 3-1')
+      } else {
+
+        const formattedProduct = 
+       { ...product.toObject(), // Convert Mongoose object to plain object
+       _id: product._id.toString()};
+      
+        return res.render('product', formattedProduct)
+        
+      }
+    } catch (error) {
+      res.status(500).json({ error: 'Error al obtener el producto' });
+      console.log('paso 4')
+    }
+  });
+
+
 
 // Agregar un nuevo producto
 productRouterViews.post('/', async (req, res) => {
